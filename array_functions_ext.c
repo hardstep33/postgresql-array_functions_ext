@@ -3,6 +3,7 @@
 #include "utils/array.h"
 #include "utils/builtins.h"
 #include "catalog/pg_type.h"
+#include "catalog/pg_collation_d.h"
 #include "utils/numeric.h"
 #include "utils/lsyscache.h"
 #include <stdbool.h>
@@ -254,6 +255,61 @@ array_exists(PG_FUNCTION_ARGS)
             if (memcmp(DatumGetPointer(elements[i]), DatumGetPointer(search), typlen) == 0)
                 PG_RETURN_BOOL(true);
         }
+    }
+
+    PG_RETURN_BOOL(false);
+}
+
+/*-------------------------- array_match --------------------------*/
+PG_FUNCTION_INFO_V1(array_match);
+
+Datum
+array_match(PG_FUNCTION_ARGS)
+{
+    ArrayType  *input_array;
+    Datum      *elements;
+    bool       *nulls;
+    int         nelems;
+    int         i;
+    text       *pattern = NULL;
+
+    if (PG_ARGISNULL(0))
+        PG_RETURN_BOOL(false);
+
+    input_array = PG_GETARG_ARRAYTYPE_P(0);
+
+    /* deconstruct text array */
+    deconstruct_array(input_array,
+                      TEXTOID,
+                      -1, false, 'i',
+                      &elements, &nulls, &nelems);
+
+    /* NULL pattern => search for NULL element */
+    if (PG_ARGISNULL(1))
+    {
+        for (i = 0; i < nelems; i++)
+        {
+            if (nulls[i])
+                PG_RETURN_BOOL(true);
+        }
+        PG_RETURN_BOOL(false);
+    }
+
+    pattern = PG_GETARG_TEXT_PP(1);
+
+    for (i = 0; i < nelems; i++)
+    {
+        Datum match;
+
+        if (nulls[i])
+            continue;
+
+        match = DirectFunctionCall2Coll(textregexeq,
+                                        DEFAULT_COLLATION_OID,
+                                        elements[i],
+                                        PointerGetDatum(pattern));
+        if (DatumGetBool(match))
+            PG_RETURN_BOOL(true);
     }
 
     PG_RETURN_BOOL(false);

@@ -16,6 +16,11 @@ CREATE OR REPLACE FUNCTION array_exists(anyarray, anyelement) RETURNS boolean
 AS 'MODULE_PATHNAME', 'array_exists'
 LANGUAGE C IMMUTABLE;
 
+-- array_match: check if any text element matches a regular expression
+CREATE OR REPLACE FUNCTION array_match(text[], text) RETURNS boolean
+AS 'MODULE_PATHNAME', 'array_match'
+LANGUAGE C IMMUTABLE;
+
 -- =========================================
 -- Tests
 -- =========================================
@@ -109,4 +114,34 @@ BEGIN
     END IF;
 
     RAISE NOTICE 'array_exists: OK';
+END $$;
+
+DO $$
+BEGIN
+    -- array_match: regex match found
+    IF NOT array_match(ARRAY['abc','dfg','123']::text[], '^a') THEN
+        RAISE EXCEPTION 'array_match test 1 failed';
+    END IF;
+
+    -- array_match: regex match not found
+    IF array_match(ARRAY['abc','dfg','123']::text[], '^t') THEN
+        RAISE EXCEPTION 'array_match test 2 failed';
+    END IF;
+
+    -- array_match: digit-only regex
+    IF NOT array_match(ARRAY['abc','dfg','123']::text[], '^\d+$') THEN
+        RAISE EXCEPTION 'array_match test 3 failed';
+    END IF;
+
+    -- array_match: NULL pattern, no NULL in array => false
+    IF array_match(ARRAY['abc','dfg','123']::text[], NULL) THEN
+        RAISE EXCEPTION 'array_match test 4 failed';
+    END IF;
+
+    -- array_match: NULL pattern, NULL in array => true
+    IF NOT array_match(ARRAY['abc','dfg',NULL]::text[], NULL) THEN
+        RAISE EXCEPTION 'array_match test 5 failed';
+    END IF;
+
+    RAISE NOTICE 'array_match: OK';
 END $$;
