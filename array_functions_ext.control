@@ -1,4 +1,0 @@
-comment = 'Extension with array mapping and utility functions'
-default_version = '1.0'
-module_pathname = '$libdir/array_functions_ext'
-relocatable = true
