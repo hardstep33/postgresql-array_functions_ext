@@ -10,7 +10,7 @@ PostgreSQL extension with array utility functions: `array_map_concat`, `array_su
 ## Build from source
 
 ```bash
-git clone [...](https://github.com/hardstep33/postgresql-array_functions_ext.git)
+git clone https://github.com/hardstep33/postgresql-array_functions_ext.git
 cd postgresql-array_functions_ext
 make
 ```
