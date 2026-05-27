@@ -10,7 +10,8 @@ PostgreSQL extension with array utility functions: `array_map_concat`, `array_su
 ## Build from source
 
 ```bash
-cd dist
+git clone https://github.com/hardstep33/postgresql-array_functions_ext.git
+cd postgresql-array_functions_ext
 make
 ```
 
@@ -19,7 +20,7 @@ make
 Copy all files from the `dist` folder to the target server and execute:
 
 ```bash
-cd dist
+cd postgresql-array_functions_ext
 sudo ./install.sh
 ```
 
