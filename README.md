@@ -7,11 +7,19 @@ PostgreSQL extension with array utility functions: `array_map_concat`, `array_su
 - PostgreSQL 15 (matching the ABI of the compiled `.so`)
 - Standard postgresql-server package (only for `pg_config`)
 
-## Install
-
-Copy all files from this folder to the target server and execute:
+## Build from source
 
 ```bash
+cd dist
+make
+```
+
+## Install binary
+
+Copy all files from the `dist` folder to the target server and execute:
+
+```bash
+cd dist
 sudo ./install.sh
 ```
 
