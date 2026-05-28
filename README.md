@@ -17,7 +17,7 @@ make
 
 ## Install binary
 
-Copy all files from the `dist` folder to the target server and execute:
+Copy all files from the project folder to the target server and execute:
 
 ```bash
 cd postgresql-array_functions_ext
